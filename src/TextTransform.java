@@ -1,41 +1,76 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import static java.lang.Character.isDigit;
 import static java.lang.Character.isWhitespace;
 
 public class TextTransform {
 
-    private static Scanner input;
+    private static final Scanner input = new Scanner(System.in);
 
     private static String textTransform(String line) {
-        StringBuilder processed = new StringBuilder();
 
+        StringBuilder processedA = new StringBuilder();
         for (int i = 0; i < line.length(); i++) {
-            Character cur = line.charAt(i);
-            processed.append(cur);
+            char cur = line.charAt(i);
+            processedA.append(cur);
             while (isWhitespace(cur) && i < line.length() - 1) {
-                Character next = line.charAt(++i);
-                if (!isWhitespace(next))
-                    processed.append(next);
+                char next = line.charAt(++i);
+                if (!isWhitespace(next)) {
+                    processedA.append(next);
+                    break;
+                }
             }
         }
+        line = processedA.toString();
 
-        line = processed.toString();
-        processed = new StringBuilder();
 
         StringBuilder processedB = new StringBuilder();
-        line.chars().forEach(
-                c -> processedB.append(c == '+' ? '!' : c)
-        );
+        for (int i = 0; i < line.length(); i++) {
+            char cur = line.charAt(i);
+            if (cur != '-') {
+                processedB.append(cur);
+            } else {
+                while (i < line.length() - 1) {
+                    char next = line.charAt(++i);
+                    if (next != '-') {
+                        processedB.insert(processedB.isEmpty() ? 0 : processedB.length() - 1, next);
+                        break;
+                    }
+                }
+            }
+        }
         line = processedB.toString();
 
 
-        for (int i = 0; i < line.length(); i++) {
-            Character cur = line.charAt(i);
-            processed.append(cur.equals('+') ? '!' : cur);
-        }
+        StringBuilder processedC = new StringBuilder();
+        line.chars().forEach(
+                c -> processedC.append(c == '+' ? '!' : (char) c)
+        );
+        line = processedC.toString();
 
 
-        return processed.toString();
+        StringBuilder processedD = new StringBuilder();
+        List<Integer> digits = new ArrayList<>();
+        line.chars().forEach(
+            i -> {
+                char c = (char) i;
+                if (!isDigit(c))
+                    processedD.append(c);
+                else
+                    digits.add(Integer.parseInt(String.valueOf(c)));
+            }
+        );
+        if (!digits.isEmpty())
+            processedD.append(" %s"
+                    .formatted(digits.stream()
+                            .mapToInt(Integer::intValue)
+                            .sum()));
+        line = processedD.toString();
+
+
+        return line;
     }
 
     public static void main(String[] args) {
